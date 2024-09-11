@@ -1,0 +1,44 @@
+spring:
+  application:
+    name: order-ms
+
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/foodcompanyorder
+      database: foodcompanyorder
+    jpa:
+      hibernate:
+        ddl-auto: none
+
+  #RabbitMQ Configuration
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+    queue-name: completed.payments
+    deadletterqueue-name: details.payment.order.dlq
+    fanout-exchange-name: completed.payments.exchange
+    deadletterexchange-name: payment.dlx
+    listener:
+      simple:
+        retry:
+          enabled: true
+          max-attempts: 3
+          initial-interval: 5000 #in milliseconds. Time to retry between messages an others
+          multiplier: 2 #For each new retry it multiplies initial interval to this number to try again later.
+          max-interval: 300000 #Maximum interval to wait this retry.
+
+logging:
+  level:
+    org.springframework.data.mongodb.core.MongoTemplate: DEBUG
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka
+  instance:
+    instance-id: ${spring.application.name}:${random.int}
+
+server:
+  port: 0
